@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="BTG | Concierge" />
+	<meta name="" content="" />
+	<title>BTG | Concierge</title>
+
+	<!-- Favicon -->
+	<link rel="icon" href="img/brand/favicon.ico" type="image/png" />
+
+	<!-- Icons -->
+	<link rel="stylesheet" href="vendor/nucleo/css/nucleo.css" type="text/css" />
+	<link rel="stylesheet" href="vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css" />
+
+	<!-- Argon CSS -->
+	<link rel="stylesheet" href="css/argon.css?v=1.2.0" type="text/css" />
+	<link href="assets/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
+
+
+
+
+</head>
+
+<body>
+
+	<div class="main-content" id="panel">
+		<!-- Topnav -->
+		<nav class="navbar navbar-top navbar-expand nav-cisco border-bottom" style="border-bottom: 1px solid #e1e1e1">
+			<div class="container-fluid">
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<!-- Search form -->
+					<form class="navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
+						<img src="./img/brand/btg.svg" width="100px" />
+					</form>
+					<!-- Navbar links -->
+
+					<ul class="navbar-nav align-items-center ml-md-auto"></ul>
+
+					<ul class="navbar-nav align-items-center ml-auto ml-md-0">
+
+						<li class="nav-item dropdown">
+
+							<a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+								aria-expanded="true">
+								<div class="media align-items-center">
+									<span class="avatar avatar-sm rounded-circle">
+										<img alt="Image placeholder" src="./img/icons/concierge-icon.svg"
+											style="width: 25px;" />
+									</span>
+									<div class="media-body ml-2">
+										<span class="mb-0 text-sm font-weight-bold" id="kitchenName">Kitchen 1</span>
+									</div>
+								</div>
+							</a>
+							<div class="dropdown-menu dropdown-menu-right" id="kitchenList">
+
+
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!-- Header -->
+		<!-- Header -->
+		<div style="
+		min-height: 90vh;
+		background-image: url(./img/theme/backgorund.jpg);
+		background-size: cover;
+		background-position: center top;
+	">
+
+			<div class="pb-2 d-flex align-items-center" style="min-height: 25px;">
+
+
+			</div>
+
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-8">
+						<div class="card">
+							<!-- Card header -->
+							<div class="card-header border-0">
+								<h3 class="mb-0">PEDIDOS
+									<button type="button" class="btn btn-sm btn-secondary float-right"
+										style="cursor: pointer;" data-toggle="modal"
+										data-target="#modal-notification">ALTERAR
+										PRODUTOS</button>
+								</h3>
+							</div>
+							<!-- Light table -->
+							<div class="row" style="padding: 10px;">
+								<div class="col-md-4">
+									<button class="btn btn-block  btn-danger btn-sm" type="button"
+										onclick="doBatch('cancelar')"> CANCELAR </button>
+								</div>
+								<div class="col-md-4">
+									<button type="button" class="btn btn-block btn-info btn-sm"
+										onclick="doBatch('iniciar')">
+										INICIAR </button>
+								</div>
+								<div class="col-md-4">
+									<button type="button" class="btn btn-block btn-success btn-sm"
+										onclick="doBatch('finalizar')"> FINALIZAR </button>
+								</div>
+							</div>
+
+
+							<div class="table-responsive">
+								<table id="example1" class="table align-items-center table-flush table-hover">
+									<thead class="thead-light">
+										<tr>
+											<th scope="col">#</th>
+											<th scope="col">SALA</th>
+											<th scope="col">HORA</th>
+											<th scope="col">STATUS</th>
+											<th scope="col">COPA</th>
+										</tr>
+									</thead>
+									<tbody id="dadosTabela">
+
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="card" id="productDetail">
+
+							<!-- Card body -->
+							<div class="card-header border-0">
+								<h3 class="mb-1">DETALHES</h3>
+							</div>
+
+							<div class="table-responsive">
+								<table class="table align-items-center table-flush">
+									<thead class="thead-light">
+										<tr>
+											<th scope="col">PRODUTO</th>
+											<th scope="col">QUANTIDADE</th>
+										</tr>
+									</thead>
+									<tbody id="detalheListaPedido">
+
+									</tbody>
+								</table>
+							</div>
+							<div class="mt-4 text-center">
+								<h5 class="h3" id="detalheSala">
+
+								</h5>
+								<div class="h5 font-weight-300" id="detalheInfoSala">
+									<i class="ni location_pin mr-2"></i>
+								</div>
+
+								<div class="card-body">
+									<div class="row">
+										<div class="col-md-2" id="cancelButton">
+
+										</div>
+										<div class="col-md-10" id="orderButton">
+
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal fade" id="modal-notification" tabindex="-1" role="dialog"
+					aria-labelledby="modal-notification" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h6 class="modal-title" id="modal-title-notification">
+									LISTA DE PRODUTOS
+								</h6>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">×</span>
+								</button>
+							</div>
+
+							<div class="modal-body">
+
+								<form id="produtosForm">
+									<div class="row">
+										<div class="col-md-8">
+											<div class="form-group">
+												<input type="text" class="form-control" name="name" id="inputPtodutoCad"
+													placeholder="Digite o nome do produto">
+											</div>
+										</div>
+										<div class="col-md-4">
+											<button type="button" class="btn btn-info btn-block"
+												id="btnProdutoCad">INSERIR</button>
+										</div>
+									</div>
+								</form>
+
+								<div class="row">
+									<div class="table-responsive">
+										<table class="table align-items-center table-flush">
+											<thead class="thead-light">
+												<tr>
+													<th scope="col">Produto</th>
+													<th scope="col">Inativo/Ativo</th>
+													<th scope="col">Apagar</th>
+												</tr>
+											</thead>
+											<tbody id="tabelaProdutos">
+
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+
+							<div class="modal-footer">
+								<button type="button" class="btn btn-white" data-dismiss="modal">FECHAR</button>
+								<button type="button" class="btn btn-success" id="atualizaProdutos">ATUALIZAR
+									SALAS</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Footer -->
+				<footer class="footer pt-0" style="background-color:rgba(0, 0, 0, 0.0);">
+					<div class="row align-items-center justify-content-lg-between">
+						<div class="col-lg-6">
+							<div class="copyright text-center text-lg-left text-muted">
+								Desenvolvido por
+								<a href="https://vitait.com" class="font-weight-bold ml-1" target="_blank"><img
+										src="./img/brand/vitait_logo.png" width="10%" /></a>
+							</div>
+						</div>
+					</div>
+				</footer>
+			</div>
+
+		</div>
+		<!-- Page content -->
+
+	</div>
+
+
+	<!-- Core -->
+	<script src="vendor/jquery/dist/jquery.min.js"></script>
+	<script src="vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Argon JS -->
+	<!-- <script src="js/argon.js?v=1.2.0"></script> -->
+
+	<script src="assets/vanilla-dataTables.min.js" type="text/javascript"></script>
+	<script src="assets/howler.js"></script>
+	<script src="http://10.193.18.254:3000/socket.io/socket.io.js"></script>
+	<script>
+		
+
+		var kitchensList = [];
+		var kitchen;
+		var orderList = [];
+		var table;
+		var datatable;
+		// var apiIp = 'http://54.158.64.71:3000';
+		let apiIp = 'http://10.193.18.254:3000';
+		// var apiIp = 'http://localhost:3000';
+		var socket = io.connect(apiIp);
+		loadKitchens();
+		loadProducts();
+		$('#productDetail').hide();
+		loadOrders();
+
+
+
+		$(function () {
+			var sound = new Howl({
+				src: ['audio/seffect.mp3']
+			});
+			sound.play();
+
+			socket.on("alerts", function (orders) {
+				sound.play();
+			})
+
+			$('#btnProdutoCad').on('click', function () {
+				console.log(sound)
+				sound.play()
+				$.ajax({
+					type: "POST",
+					url: apiIp + '/api/v1/product',
+					data: { name: $('#inputPtodutoCad').val() },
+					success: function (res) {
+						if (res.status == 'success') {
+							$('#inputPtodutoCad').val('')
+							loadProducts();
+						} else {
+							console.log(res)
+						}
+					}
+				})
+			})
+
+			$('#atualizaProdutos').on('click', function () {
+				updateDevices();
+			});
+		})
+
+		function selecionaPedido(item) {
+			// var od = orderList.find(el => el.id === item)
+			var od;
+			for (var j = 0; j < orderList.length; j++) {
+				if (orderList[j].id == item) {
+					od = orderList[j];
+				}
+			}
+			var od;
+			if (od) {
+				$('#detalheListaPedido').html('');
+				$('#detalheSala').html('');
+				$('#detalheInfoSala').html('');
+				$('#orderButton').html('');
+
+				var produtos = od.products
+				var pedido = '';
+				for (var i = 0; i < produtos.length; i++) {
+					pedido += '<tr><td>' + produtos[i].name + '</td><td>' + produtos[i].quantity + '</td></tr>';
+				}
+
+				$('#detalheListaPedido').html(pedido);
+				$('#detalheSala').html(od.room);
+				$('#detalheInfoSala').html(od.description);
+
+				changeStatusDetail(od);
+				$('#productDetail').show();
+			} else {
+				$('#productDetail').hide();
+			}
+		}
+
+		function doBatch(type) {
+			var r = confirm('Você tem certeza?, Todas os pedidos serão atualizados!')
+			if (r == true) {
+				$('input[type=checkbox]').each(function () {
+					var value = (this.checked ? $(this).val() : 0);
+					if (value > 0) {
+						if (type == 'cancelar') {
+							orderStatus(value, 'canceled');
+						} else if (type == 'iniciar') {
+							orderStatus(value, 'processing')
+						} else if (type == 'finalizar') {
+							orderStatus(value, 'done')
+						}
+					}
+				});
+			}
+			$('#productDetail').hide();
+		}
+
+
+		function changeStatusDetail(res) {
+
+			if (res.status == 'pending') {
+				$('#cancelButton').html('<button  class="btn btn-icon  btn-2 btn-danger btn-sm" 		type="button" onclick="cancelOrder(\'' + res.id + '\')" data-toggle="tooltip" 				data-placement="top" title="CANCEL"> <span class="btn-inner--icon"><i class="ni 	ni-fat-remove"></i></span> </button>');
+
+				$('#orderButton').html('<button type="button" class="btn btn-block btn-info btn-sm" onclick="orderStatus(\'' + res.id + '\', \'processing\')"> INICIAR PEDIDO </button>');
+
+			} else if (res.status == 'processing') {
+				$('#cancelButton').html('<button  class="btn btn-icon  btn-2 btn-danger btn-sm" 		type="button" onclick="cancelOrder(\'' + res.id + '\')" data-toggle="tooltip" 				data-placement="top" title="CANCEL"> <span class="btn-inner--icon"><i class="ni 	ni-fat-remove"></i></span> </button>');
+
+				$('#orderButton').html('<button type="button" class="btn btn-block btn-success btn-sm" onclick="orderStatus(\'' + res.id + '\', \'done\')"> FINALIZAR PEDIDO </button>');
+
+			} else if (res.status == 'canceled') {
+				$('#cancelButton').html('');
+				$('#orderButton').html('')
+			} else {
+				$('#cancelButton').html('');
+				$('#orderButton').html('')
+			}
+			loadOrders();
+		}
+
+
+
+		function loadProducts() {
+			$.ajax({
+				type: 'GET',
+				url: apiIp + '/api/v1/product',
+				success: function (res) {
+					if (res.status == 'success') {
+						var produtos = res.data
+						var row = ''
+						for (var i = 0; i < produtos.length; i++) {
+							var x = produtos[i].status == 0 ? '' : 'checked';
+							row += '<tr><td>' + produtos[i].name + '</td><td><label class="custom-toggle"><input type="checkbox" ' + x + ' onclick="statusProduto(\'' + produtos[i].id + '\', \'' + produtos[i].status + '\')"><span class="custom-toggle-slider rounded-circle"></span></label></td><td><button class="btn btn-icon btn-sm btn-2 btn-danger" type="button" onclick="excluirProduto(' + produtos[i].id + ')" data-toggle="tooltip" data-placement="top" title="excluir"><span class="btn-inner--icon"><i class="ni ni-fat-remove"></i></span></button></td></tr>';
+						}
+						$('#tabelaProdutos').html(row)
+					}
+				}, error: function (err) {
+					console.log(err)
+				}
+			})
+		}
+
+		function updateDatatable(arr) {
+			datatable.destroy();
+
+			var row = '';
+			for (var i = 0; i < arr.length; i++) {
+				var stats = ''
+				var dt = new Date(arr[i].created_at)
+				if (arr[i].status == 'done') {
+					stats = '<a href="#"><i class="fa fa-circle text-success"></i> ' + arr[i].status + '</a>';
+				} else if (arr[i].status == 'pending') {
+					stats = '<a href="#"><i class="fa fa-circle text-info"></i> ' + arr[i].status + '</a>';
+				} else if (arr[i].status == 'processing') {
+					stats = '<a href="#"><i class="fa fa-circle text-info"></i> ' + arr[i].status + '</a>';
+				} else if (arr[i].status == 'canceled') {
+					stats = '<a href="#"><i class="fa fa-circle text-danger"></i> ' + arr[i].status + '</a>';
+				}
+				row += '<tr  ><td>  <input type="checkbox" class="checkbox"  value="' + arr[i].id + '"> </td><td onclick="selecionaPedido(' + arr[i].id + ')">' + arr[i].room + '</td><td onclick="selecionaPedido(' + arr[i].id + ')">' + dt.getHours() + ':' + dt.getMinutes() + '</td><td onclick="selecionaPedido(' + arr[i].id + ')">' + stats + '</td><td onclick="selecionaPedido(' + arr[i].id + ')">' + arr[i].kitchen + '</td></tr>';
+			}
+			$('#dadosTabela').html(row)
+
+
+			datatable.refresh();
+
+		};
+
+		function loadOrders() {
+			$.ajax({
+				type: 'GET',
+				url: apiIp + '/api/v1/order',
+				success: function (res) {
+
+					var orders = res.data
+					var newArr = []
+					var row = '';
+					for (var i = 0; i < orders.length; i++) {
+						var obj = {
+							id: orders[i][0].id,
+							room: orders[i][0].room,
+							status: orders[i][0].status,
+							created_at: orders[i][0].created_at,
+							kitchen: orders[i][0].kitchen,
+							description: orders[i][0].description,
+							products: []
+						}
+						for (var j = 0; j < orders[i].length; j++) {
+							obj.products.push({
+								name: orders[i][j].product,
+								quantity: orders[i][j].quantity
+							})
+						}
+						newArr.push(obj)
+
+					}
+
+					orderList = newArr;
+
+
+
+					datatable = new DataTable("#example1", {
+						searchable: false,
+						fixedHeight: false,
+						sortable: true,
+						perPage: 18,
+						perPageSelect: false,
+						labels: {
+							info: "",
+						}
+					});
+
+					updateDatatable(orderList);
+				}
+			})
+		}
+
+		function excluirProduto(item) {
+			var r = confirm('Você tem certeza?, Se você apagar, o produto não estará mais disponível')
+			if (r == true) {
+				$.ajax({
+					type: 'DELETE',
+					url: apiIp + '/api/v1/product/' + item,
+					success: function (res) {
+						if (res.status == 'success') {
+							alert('O produto foi apagado!')
+							loadProducts()
+						}
+					}
+				})
+			} else {
+
+			}
+
+		}
+
+		function updateDevices() {
+			var r = confirm('Você tem certeza?, Todas as salas serão atualizadas!')
+			if (r == true) {
+				$.ajax({
+					type: 'GET',
+					url: apiIp + '/api/v1/room/devices',
+					success: function (res) {
+						if (res.status == 'success') {
+							alert('Todas as salas foram atualizadas!')
+						}
+					}
+				})
+			} else {
+
+			}
+		}
+
+		function orderStatus(id, status) {
+			$.ajax({
+				type: 'PUT',
+				url: apiIp + '/api/v1/order/' + id,
+				data: { stats: status, kitchen_id: kitchen.id },
+				success: function (res) {
+					var product = res.data[0];
+					var index = 0;
+					for (var i = 0; i < orderList.length; i++) {
+						if (orderList[i].id == product.id) {
+							index = i
+						}
+					}
+					orderList[index].status = product.status;
+					changeStatusDetail(product);
+				}
+			})
+		}
+
+		function selectKitchen(id) {
+			for (var i = 0; i < kitchensList.length; i++) {
+				if (kitchensList[i].id === id) {
+					kitchen = kitchensList[i];
+				}
+			}
+			$('#kitchenName').html(kitchen.name)
+			$('#kitchenTitle').html(kitchen.name)
+		}
+
+		function loadKitchens() {
+			$.ajax({
+				type: 'GET',
+				url: apiIp + '/api/v1/kitchen',
+				success: function (res) {
+					$('#kitchenList').html('');
+					kitchensList = res.data;
+					kitchen = kitchensList[0];
+					var row = ''
+					for (var i = 0; i < kitchensList.length; i++) {
+						row += '<a href="#" onclick="selectKitchen(' + kitchensList[i].id + ')" class="dropdown-item"><span>' + kitchensList[i].name + '</span></a>';
+					}
+					$('#kitchenList').html(row);
+				}
+			})
+		}
+
+		function cancelOrder(id) {
+			var r = confirm('Se você cancelar, o pedido não estará mais disponível')
+			if (r == true) {
+				orderStatus(id, 'canceled');
+			} else {
+				txt = "You pressed Cancel!";
+			}
+
+		}
+
+		function statusProduto(item, status) {
+			$.ajax({
+				type: 'PUT',
+				url: apiIp + '/api/v1/product/status/' + item,
+				data: { stats: status },
+				success: function (res) {
+					if (res.status == 'success') {
+
+					}
+				}
+			})
+		}
+
+		socket.on("orders", function (orders) {
+			loadOrders()
+		})
+
+		socket.on("products", function (products) {
+			loadProducts()
+		})
+
+		socket.on("kitchens", function (kitchens) {
+
+		})
+	</script>
+</body>
+
+
+
+
+</html>

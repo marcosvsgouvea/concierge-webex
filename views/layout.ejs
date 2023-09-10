@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="Vita | Concierge" />
+	<meta name="" content="" />
+	<title>Vita | Concierge</title>
+
+	<!-- Favicon -->
+	<link rel="icon" href="<%- ip %>/img/brand/vitait_favicon.png" type="image/png" />
+
+	<!-- Icons -->
+	<link rel="stylesheet" href="<%- ip %>/vendor/nucleo/css/nucleo.css" type="text/css" />
+	<link rel="stylesheet" href="<%- ip %>/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css" />
+
+	<!-- Argon CSS -->
+	<link rel="stylesheet" href="<%- ip %>/css/argon.css?v=1.2.0" type="text/css" />
+	<link href="<%- ip %>/assets/vanilla-dataTables.min.css" rel="stylesheet" type="text/css">
+
+
+	<style>
+		.table td,
+		.table th {
+			font-size: 1.1rem;
+			white-space: nowrap;
+		}
+	</style>
+
+</head>
+
+<body>
+	<%- body %>
+
+	<!-- Core -->
+	<script src="<%- ip %>/vendor/jquery/dist/jquery.min.js"></script>
+	<script src="<%- ip %>/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script src="<%- ip %>/assets/vanilla-dataTables.min.js" type="text/javascript"></script>
+	<script src="<%- ip %>/assets/howler.js"></script>
+	<script src="<%- ip %>/socket.io/socket.io.js"></script>
+	<script>
+		try {
+			var socket = io();
+
+
+			var kitchensList = [];
+			var kitchen;
+			var orderList = [];
+			var table;
+			var sound = new Howl({
+				src: ['./audio/seffect.mp3']
+			});
+			var datatable = new DataTable("#example1", {
+				searchable: false,
+				fixedHeight: false,
+				sortable: true,
+				perPage: 8,
+				perPageSelect: false,
+				labels: {
+					info: "",
+				}
+			});
+
+			var apiIp = '<%- ip %>';
+			//prompt(apiIp)
+			$.ajaxSetup({ cache: false });
+
+
+			loadKitchens();
+			loadProducts();
+			$('#productDetail').hide();
+			loadOrders();
+		} catch (error) {
+			// prompt(JSON.stringify(error))
+		}
+
+
+
+		$(function () {
+			try {
+
+				sound.play();
+
+				$('#btnProdutoCad').on('click', function () {
+					
+					$.ajax({
+						type: "POST",
+						url: apiIp + '/api/v1/product',
+						data: { name: $('#inputPtodutoCad').val() },
+						success: function (res) {
+							if (res.status == 'success') {
+								$('#inputPtodutoCad').val('')
+								loadProducts();
+							} else {
+								console.log(res)
+							}
+						}, error: function (err) {
+							// prompt(JSON.stringify(err))
+						}
+					})
+				})
+
+				$('#atualizaProdutos').on('click', function () {
+					updateDevices();
+				});
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		})
+
+		function selecionaPedido(item) {
+			try {
+				// var od = orderList.find(el => el.id === item)
+				var od;
+				for (var j = 0; j < orderList.length; j++) {
+					if (orderList[j].id == item) {
+						od = orderList[j];
+					}
+				}
+				var od;
+				if (od) {
+					$('#detalheListaPedido').html('');
+					$('#detalheSala').html('');
+					$('#detalheInfoSala').html('');
+					$('#orderButton').html('');
+
+					var produtos = od.products
+					var pedido = '';
+					for (var i = 0; i < produtos.length; i++) {
+						pedido += '<tr><td  style="font-size:1.5rem;">' + produtos[i].name + '</td><td  style="font-size:1.5rem;">' + produtos[i].quantity + '</td></tr>';
+					}
+
+					$('#detalheListaPedido').html(pedido);
+					$('#detalheSala').html(od.room);
+					$('#detalheInfoSala').html(od.description);
+
+					changeStatusDetail(od);
+					$('#productDetail').show();
+				} else {
+					$('#productDetail').hide();
+				}
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function doBatch(type) {
+			try {
+				var r = confirm('Você tem certeza?, Todas os pedidos serão atualizados!')
+				if (r == true) {
+					$('input[type=checkbox]').each(function () {
+						var value = (this.checked ? $(this).val() : 0);
+						if (value > 0) {
+							if (type == 'cancelar') {
+								orderStatus(value, 'canceled');
+							} else if (type == 'iniciar') {
+								orderStatus(value, 'processing')
+							} else if (type == 'finalizar') {
+								orderStatus(value, 'done')
+							}
+						}
+					});
+				}
+				$('#productDetail').hide();
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function changeStatusDetail(res) {
+			try {
+				if (res.status == 'pending') {
+					$('#cancelButton').html('<button  class="btn btn-icon  btn-2 btn-danger btn-sm" 		type="button" onclick="cancelOrder(\'' + res.id + '\')" data-toggle="tooltip" 				data-placement="top" title="CANCEL"> <span class="btn-inner--icon"><i class="ni 	ni-fat-remove"></i></span> </button>');
+
+					$('#orderButton').html('<button type="button" class="btn btn-block btn-info btn-sm" onclick="orderStatus(\'' + res.id + '\', \'processing\')"> INICIAR PEDIDO </button>');
+
+				} else if (res.status == 'processing') {
+					$('#cancelButton').html('<button  class="btn btn-icon  btn-2 btn-danger btn-sm" 		type="button" onclick="cancelOrder(\'' + res.id + '\')" data-toggle="tooltip" 				data-placement="top" title="CANCEL"> <span class="btn-inner--icon"><i class="ni 	ni-fat-remove"></i></span> </button>');
+
+					$('#orderButton').html('<button type="button" class="btn btn-block btn-success btn-sm" onclick="orderStatus(\'' + res.id + '\', \'done\')"> FINALIZAR PEDIDO </button>');
+
+				} else if (res.status == 'canceled') {
+					$('#cancelButton').html('');
+					$('#orderButton').html('')
+				} else {
+					$('#cancelButton').html('');
+					$('#orderButton').html('')
+				}
+
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function loadProducts() {
+			try {
+				$.ajax({
+					type: 'GET',
+					url: apiIp + '/api/v1/product',
+					success: function (res) {
+						if (res.status == 'success') {
+							var produtos = res.data
+							var row = ''
+							for (var i = 0; i < produtos.length; i++) {
+								var x = produtos[i].status == 0 ? '' : 'checked';
+								row += '<tr><td>' + produtos[i].name + '</td><td><label class="custom-toggle"><input type="checkbox" ' + x + ' onclick="statusProduto(\'' + produtos[i].id + '\', \'' + produtos[i].status + '\')"><span class="custom-toggle-slider rounded-circle"></span></label></td><td><button class="btn btn-icon btn-sm btn-2 btn-danger" type="button" onclick="excluirProduto(' + produtos[i].id + ')" data-toggle="tooltip" data-placement="top" title="excluir"><span class="btn-inner--icon"><i class="ni ni-fat-remove"></i></span></button></td></tr>';
+							}
+							$('#tabelaProdutos').html(row)
+						}
+					}, error: function (err) {
+						prompt(JSON.stringify(err))
+					}
+				})
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function updateDatatable(arr) {
+			try {
+				datatable.destroy();
+
+				var row = '';
+				for (var i = 0; i < arr.length; i++) {
+					var stats = ''
+					var dt = new Date(arr[i].created_at)
+					if (arr[i].status == 'done') {
+						stats = '<span class="badge badge-success">' + arr[i].status + '</span>';
+					} else if (arr[i].status == 'pending') {
+						stats = '<span class="badge badge-info">' + arr[i].status + '</span>';
+					} else if (arr[i].status == 'processing') {
+						stats = '<span class="badge badge-primary">' + arr[i].status + '</span>';
+					} else if (arr[i].status == 'canceled') {
+						stats = '<span class="badge badge-danger">' + arr[i].status + '</span>';
+					}
+					row += '<tr  ><td>  <input type="checkbox" class="checkbox"  value="' + arr[i].id + '"> </td><td onclick="selecionaPedido(' + arr[i].id + ')">' + arr[i].room + '</td><td onclick="selecionaPedido(' + arr[i].id + ')">' + addZero(dt.getHours()) + ':' + addZero(dt.getMinutes()) + '</td><td onclick="selecionaPedido(' + arr[i].id + ')">' + stats + '</td><td onclick="selecionaPedido(' + arr[i].id + ')">' + arr[i].kitchen + '</td></tr>';
+				}
+				$('#dadosTabela').html(row)
+
+				datatable.init({
+					searchable: false,
+					fixedHeight: false,
+					sortable: true,
+					perPage: 8,
+					perPageSelect: false,
+					labels: {
+						info: "",
+					}
+				});
+				datatable.refresh();
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		};
+
+		function addZero(i) {
+			if (i < 10) {
+				i = "0" + i;
+			}
+			return i;
+		}
+
+		function loadOrders() {
+			try {
+				$.ajax({
+					type: 'GET',
+					url: apiIp + '/api/v1/order',
+					success: function (res) {
+
+						var orders = res.data
+						var newArr = []
+						var row = '';
+						for (var i = 0; i < orders.length; i++) {
+							var obj = {
+								id: orders[i][0].id,
+								room: orders[i][0].room,
+								status: orders[i][0].status,
+								created_at: orders[i][0].created_at,
+								kitchen: orders[i][0].kitchen,
+								description: orders[i][0].description,
+								products: []
+							}
+							for (var j = 0; j < orders[i].length; j++) {
+								obj.products.push({
+									name: orders[i][j].product,
+									quantity: orders[i][j].quantity
+								})
+							}
+							newArr.push(obj)
+
+						}
+
+						orderList = newArr;
+
+
+
+
+
+						updateDatatable(orderList);
+					}, error: function (err) {
+						// prompt(JSON.stringify(err))
+					}
+				})
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function excluirProduto(item) {
+			try {
+
+				var r = confirm('Você tem certeza?, Se você apagar, o produto não estará mais disponível')
+				if (r == true) {
+					$.ajax({
+						type: 'DELETE',
+						url: apiIp + '/api/v1/product/' + item,
+						success: function (res) {
+							if (res.status == 'success') {
+								alert('O produto foi apagado!')
+								loadProducts()
+							}
+						}, error: function (err) {
+							// prompt(JSON.stringify(err))
+						}
+					})
+				} else {
+
+				}
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function updateDevices() {
+			try {
+				var r = confirm('Você tem certeza?, Todas as salas serão atualizadas!')
+				if (r == true) {
+					$.ajax({
+						type: 'GET',
+						url: apiIp + '/api/v1/room/devices',
+						success: function (res) {
+							if (res.status == 'success') {
+								alert('Todas as salas foram atualizadas!')
+							}
+						}, error: function (err) {
+							// prompt(JSON.stringify(err))
+						}
+					})
+				} else {
+
+				}
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function orderStatus(id, status) {
+			try {
+				$.ajax({
+					type: 'PUT',
+					url: apiIp + '/api/v1/order/' + id,
+					data: { stats: status, kitchen_id: kitchen.id },
+					success: function (res) {
+						var product = res.data[0];
+						var index = 0;
+						for (var i = 0; i < orderList.length; i++) {
+							if (orderList[i].id == product.id) {
+								index = i
+							}
+						}
+						orderList[index].status = product.status;
+						loadOrders();
+						changeStatusDetail(product);
+					}, error: function (err) {
+						// prompt(JSON.stringify(err))
+					}
+				})
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function selectKitchen(id) {
+			try {
+				for (var i = 0; i < kitchensList.length; i++) {
+					if (kitchensList[i].id === id) {
+						kitchen = kitchensList[i];
+					}
+				}
+				$('#kitchenName').html(kitchen.name)
+				$('#kitchenTitle').html(kitchen.name)
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function loadKitchens() {
+			try {
+				$.ajax({
+					type: 'GET',
+					url: apiIp + '/api/v1/kitchen',
+					success: function (res) {
+						$('#kitchenList').html('');
+						kitchensList = res.data;
+						kitchen = kitchensList[0];
+						$('#kitchenName').html(kitchen.name)
+						$('#kitchenTitle').html(kitchen.name)
+						var row = ''
+						for (var i = 0; i < kitchensList.length; i++) {
+							row += '<a href="#" onclick="selectKitchen(' + kitchensList[i].id + ')" class="dropdown-item"><span>' + kitchensList[i].name + '</span></a>';
+						}
+						
+						$('#kitchenList').html(row);
+					}, error: function (err) {
+						// prompt(JSON.stringify(err))
+					}
+				})
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function cancelOrder(id) {
+			try {
+				var r = confirm('Se você cancelar, o pedido não estará mais disponível')
+				if (r == true) {
+					orderStatus(id, 'canceled');
+				} else {
+					txt = "You pressed Cancel!";
+				}
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+		function statusProduto(item, status) {
+			try {
+				$.ajax({
+					type: 'PUT',
+					url: apiIp + '/api/v1/product/status/' + item,
+					data: { stats: status },
+					success: function (res) {
+						if (res.status == 'success') {
+
+						}
+					}, error: function (err) {
+						// prompt(JSON.stringify(err))
+					}
+				})
+			} catch (error) {
+				// prompt(JSON.stringify(error))
+			}
+		}
+
+
+
+		try {
+
+			socket.on("alerts", function (msg) {
+				sound.play();
+			})
+
+			socket.on("orders", function (orders) {
+				$('#productDetail').hide();
+				loadOrders()
+			})
+
+			socket.on("products", function (products) {
+				loadProducts()
+			})
+
+			socket.on("kitchens", function (kitchens) {
+
+			})
+		} catch (error) {
+			// prompt(JSON.stringify(error))
+		}
+	</script>
+</body>
+
+
+
+
+</html>

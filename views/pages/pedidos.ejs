@@ -1,0 +1,220 @@
+<div class="main-content" id="panel">
+	<!-- Topnav -->
+	<nav class="navbar navbar-top navbar-expand nav-cisco border-bottom" style="border-bottom: 1px solid #e1e1e1">
+		<div class="container-fluid">
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<!-- Search form -->
+				<form class="navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
+					<img src="./img/brand/vitait_logo.png" width="100px" />
+				</form>
+				<!-- Navbar links -->
+
+				<ul class="navbar-nav align-items-center ml-md-auto"></ul>
+
+				<ul class="navbar-nav align-items-center ml-auto ml-md-0">
+
+					<li class="nav-item dropdown">
+
+						<a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="true">
+							<div class="media align-items-center">
+								<span class="avatar avatar-sm rounded-circle">
+									<img alt="Image placeholder" src="./img/icons/concierge-icon.svg"
+										style="width: 25px;" />
+								</span>
+								<div class="media-body ml-2">
+									<span class="mb-0 text-sm font-weight-bold" id="kitchenName">Kitchen 1</span>
+								</div>
+							</div>
+						</a>
+						<div class="dropdown-menu dropdown-menu-right" id="kitchenList">
+
+
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- Header -->
+	<!-- Header -->
+	<div style="
+	min-height: 90vh;
+	background-image: url(./img/theme/backgorund.jpg);
+	background-size: cover;
+	background-position: center top;
+">
+
+		<div class="pb-2 d-flex align-items-center" style="min-height: 25px;">
+
+
+		</div>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-8">
+					<div class="card">
+						<!-- Card header -->
+						<div class="card-header border-0">
+							<h3 class="mb-0">PEDIDOS
+								<button type="button" class="btn btn-sm btn-secondary float-right"
+									style="cursor: pointer;" data-toggle="modal"
+									data-target="#modal-notification">ALTERAR
+									PRODUTOS</button>
+							</h3>
+						</div>
+						<!-- Light table -->
+						<div class="row" style="padding: 10px;">
+							<div class="col-md-4">
+								<button class="btn btn-block  btn-danger btn-sm" type="button"
+									onclick="doBatch('cancelar')"> CANCELAR  </button>
+							</div>
+							<div class="col-md-4">
+								<button type="button" class="btn btn-block btn-info btn-sm"
+									onclick="doBatch('iniciar')">
+									INICIAR  </button>
+							</div>
+							<div class="col-md-4">
+								<button type="button" class="btn btn-block btn-success btn-sm"
+									onclick="doBatch('finalizar')"> FINALIZAR  </button>
+							</div>
+						</div>
+
+
+						<div class="table-responsive">
+							<table id="example1" class="table align-items-center table-flush table-hover">
+								<thead class="thead-light">
+									<tr>
+										<th scope="col">#</th>
+										<th scope="col">SALA</th>
+										<th scope="col">HORA</th>
+										<th scope="col">STATUS</th>
+										<th scope="col">COPA</th>
+									</tr>
+								</thead>
+								<tbody id="dadosTabela">
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card" id="productDetail">
+
+						<!-- Card body -->
+						<div class="card-header border-0">
+							<h3 class="mb-1">DETALHES</h3>
+						</div>
+
+						<div class="table-responsive">
+							<table class="table align-items-center table-flush">
+								<thead class="thead-light">
+									<tr>
+										<th scope="col">PRODUTO</th>
+										<th scope="col">QTD</th>
+									</tr>
+								</thead>
+								<tbody id="detalheListaPedido">
+
+								</tbody>
+							</table>
+						</div>
+						<div class="mt-4 text-center">
+							<h5 class="h3" style="font-size:1.5rem;" id="detalheSala">
+
+							</h5>
+							<div class="h5 font-weight-300" id="detalheInfoSala">
+								<i class="ni location_pin mr-2"></i>
+							</div>
+
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-2" id="cancelButton">
+
+									</div>
+									<div class="col-md-10" id="orderButton">
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="modal fade" id="modal-notification" tabindex="-1" role="dialog"
+				aria-labelledby="modal-notification" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h6 class="modal-title" id="modal-title-notification">
+								LISTA DE PRODUTOS
+							</h6>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+
+						<div class="modal-body">
+
+							<form id="produtosForm">
+								<div class="row">
+									<div class="col-md-8">
+										<div class="form-group">
+											<input type="text" class="form-control" name="name" id="inputPtodutoCad"
+												placeholder="Digite o nome do produto">
+										</div>
+									</div>
+									<div class="col-md-4">
+										<button type="button" class="btn btn-info btn-block"
+											id="btnProdutoCad">INSERIR</button>
+									</div>
+								</div>
+							</form>
+
+							<div class="row">
+								<div class="table-responsive">
+									<table class="table align-items-center table-flush">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col">Produto</th>
+												<th scope="col">Inativo/Ativo</th>
+												<th scope="col">Apagar</th>
+											</tr>
+										</thead>
+										<tbody id="tabelaProdutos">
+
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-white" data-dismiss="modal">FECHAR</button>
+							<button type="button" class="btn btn-success" id="atualizaProdutos">ATUALIZAR SALAS</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer pt-0" style="background-color:rgba(0, 0, 0, 0.0);">
+				<div class="row align-items-center justify-content-lg-between">
+					<div class="col-lg-6">
+						<div class="copyright text-center text-lg-left text-muted">
+							Desenvolvido por
+							<a href="https://vitait.com" class="font-weight-bold ml-1" target="_blank"><img
+									src="./img/brand/vitait_logo.png" width="10%" /></a>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+
+	</div>
+	<!-- Page content -->
+
+</div>
